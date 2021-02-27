@@ -12,21 +12,23 @@ public class Tile extends StackPane {
     private boolean open;
     private int value;
     private final int TILE_SIZE = 40;
+    private Board board;
 
     Rectangle border = new Rectangle(TILE_SIZE - 2, TILE_SIZE - 2);
     Text text = new Text();
 
-    public Tile(int x, int y, boolean hasBomb) {
+    public Tile(int x, int y, boolean hasBomb, Board board) {
         this.x = x;
         this.y = y;
         this.hasBomb = hasBomb;
 
+        this.board = board;
 
         border.setStroke(Color.LIGHTGRAY);
         text.setText(hasBomb ? "X" : "");
         text.setFont(Font.font(18));
         text.setFill(Color.WHITE);
-        text.setVisible(true);
+        text.setVisible(false);
 
         getChildren().addAll(border, text);
 
@@ -38,7 +40,7 @@ public class Tile extends StackPane {
     }
 
     public void openTile() {
-        System.out.println(x+ " " + y);
+
         if(open)
             return;
 
@@ -50,12 +52,17 @@ public class Tile extends StackPane {
         open = true;
         text.setVisible(true);
 
+        if( text.getText().isEmpty() ) {
+            board.getNeighbours(this).forEach(tile -> tile.openTile());
+        }
+
 
     }
 
     public void setValue(int value) {
         this.value = value;
-        this.text.setText(String.valueOf(value));
+        if(value != 0)
+            this.text.setText(String.valueOf(value));
     }
 
     public void setBomb() {
